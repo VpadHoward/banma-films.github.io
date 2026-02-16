@@ -131,42 +131,39 @@
             }
         }
 
-        function loadWallComments(login) {
-            const allWalls = JSON.parse(localStorage.getItem('banma_wall_data')) || {};
-            const comments = allWalls[login] || [];
-            const list = document.getElementById('wall-comments-list');
-            
-            list.innerHTML = comments.length ? comments.map(c => `
-                <div class="wall-msg">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <strong style="color:var(--gold); cursor:pointer;" onclick="viewUser('${c.from}')">${c.from}</strong>
-                        <small style="opacity:0.4; font-size:0.7rem;">${c.date}</small>
-                    </div>
-                    <p style="font-size:0.9rem; line-height:1.4;">${c.text}</p>
-                </div>
-            `).join('') : '<p style="text-align:center; opacity:0.3;">Здесь пока тишина...</p>';
-        }
+        function loadWallComments(ownerLogin) {
+    // Слушаем изменения в реальном времени!
+    db.ref('walls/' + ownerLogin).on('value', (snapshot) => {
+        const comments = snapshot.val() || [];
+        const list = document.getElementById('wall-comments-list');
+        
+        list.innerHTML = comments.length ? comments.map(c => `
+            <div class="wall-msg">
+                <strong style="color:var(--gold); cursor:pointer;" onclick="viewUser('${c.from}')">${c.from}</strong>
+                <p>${c.text}</p>
+                <small>${c.date}</small>
+            </div>
+        `).reverse().join('') : '<p>Тут пока пусто.</p>';
+    });
+}
 
-        function saveWallComment() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const text = document.getElementById('wall-text').value.trim();
-            if (!text || !currentUser) return;
+function saveWallComment() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const text = document.getElementById('wall-text').value.trim();
+    if (!text || !currentUser) return;
 
-            const allWalls = JSON.parse(localStorage.getItem('banma_wall_data')) || {};
-            
-            if (!allWalls[profileOwnerLogin]) allWalls[profileOwnerLogin] = [];
-
-            allWalls[profileOwnerLogin].unshift({
-                from: currentUser.login,
-                text: text,
-                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString().slice(0,5)
-            });
-
-            localStorage.setItem('banma_wall_data', JSON.stringify(allWalls));
-            document.getElementById('wall-text').value = '';
-            loadWallComments(profileOwnerLogin);
-        }
-
+    const wallRef = db.ref('walls/' + profileOwnerLogin);
+    wallRef.get().then((snapshot) => {
+        let comments = snapshot.val() || [];
+        comments.push({
+            from: currentUser.login,
+            text: text,
+            date: new Date().toLocaleString()
+        });
+        wallRef.set(comments);
+        document.getElementById('wall-text').value = '';
+    });
+}
         function resetProfileView() {
             localStorage.removeItem('view_target_user');
             window.location.href = 'profile.html';
@@ -199,5 +196,6 @@
     </script>
 </body>
 </html>
+
 
 
