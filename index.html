@@ -18,7 +18,8 @@
     </header>
 
     <section class="hero">
-        <span class="easter-egg" onclick="findEgg('baba')" style="position: absolute; top: 20px; left: 20px; opacity: 0.01; font-size: 0.8rem;">БАБА БАБА КРУТОЙ</span>
+        <span class="easter-egg" onclick="findEgg('baba')" style="position: absolute; top: 100px; left: 20px; opacity: 0.05; font-size: 1rem; font-weight:bold;">БАБА БАБА КРУТОЙ</span>
+        
         <h1>Был богом, но стал рабом принцессы</h1>
         <div class="genres">
             <span class="genre-tag">Фентези</span>
@@ -43,7 +44,7 @@
             
             <div class="dev-notice" style="text-align:center; padding:20px; border:1px dashed var(--accent); margin-bottom:20px;">
                 <p style="color:var(--gold);">ВИДЕОПЛЕЕР СЕЙЧАС НЕДОСТУПЕН</p>
-                <span style="font-size:0.8rem;">Серия находится в стадии отрисовки ключевых кадров студией BANMA FILMS.</span>
+                <span style="font-size:0.8rem;">Серия находится в стадии отрисовки ключевых кадров.</span>
             </div>
 
             <div class="comments-section">
@@ -63,7 +64,7 @@
 
     <footer>
         <p>© BANMA FILMS STUDIO 2026</p>
-        <span class="easter-egg" onclick="findEgg('a4')" style="display:block; margin-top:20px; font-size: 0.5rem; letter-spacing: 5px; opacity: 0.05; color: #333;">Серёга А4 настоящий</span>
+        <span class="easter-egg" onclick="findEgg('a4')" style="display:block; margin-top:20px; font-size: 0.6rem; letter-spacing: 5px; opacity: 0.1; color: #555;">Серёга А4 настоящий</span>
     </footer>
 
     <script src="auth-logic.js"></script>
@@ -76,7 +77,6 @@
             const formBox = document.getElementById('comment-form-box');
             const authMsg = document.getElementById('auth-check-msg');
 
-            // Очищаем цель просмотра профиля при возврате на главную
             localStorage.removeItem('view_target_user');
 
             if (user) {
@@ -121,11 +121,10 @@
                 const userData = users.find(u => u.login === c.name);
                 const avatar = (userData && userData.avatar) ? userData.avatar : 'https://via.placeholder.com/40';
                 
-                // Добавляем onclick для перехода в профиль
                 return `
                     <div class="comment-item">
                         <div class="user-link" onclick="viewUser('${c.name}')" style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                            <img src="${avatar}" class="comment-avatar">
+                            <img src="${avatar}" class="comment-avatar" style="width:30px; height:30px; border-radius:50%;">
                             <strong style="color:var(--gold);">${c.name}</strong>
                         </div>
                         <p>${c.text}</p>
