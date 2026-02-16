@@ -1,4 +1,3 @@
-// Функция для просмотра чужого профиля
 function viewUser(username) {
     localStorage.setItem('view_target_user', username);
     window.location.href = 'profile.html';
@@ -20,6 +19,13 @@ function findEgg(eggName) {
         setTimeout(() => toast.remove(), 3000);
 
         if(found.length === 5) alert("АЧИВКА РАЗБЛОКИРОВАНА: ДЕТЕКТИВ!");
+    } else {
+        let toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.style.background = '#333';
+        toast.innerText = "Вы уже нашли этот секрет!";
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
     }
 }
 
@@ -33,7 +39,7 @@ function handleAuth(type) {
         if (users.some(u => u.login === login)) return alert("Ник занят!");
         users.push({ login, pass, avatar: null });
         localStorage.setItem('banma_users', JSON.stringify(users));
-        alert("Регистрация успешна!");
+        alert("Регистрация успешна! Теперь войдите.");
     } else {
         const user = users.find(u => u.login === login && u.pass === pass);
         if (user) {
