@@ -65,7 +65,12 @@ nav a.active, nav a:hover { color: var(--gold); text-shadow: 0 0 5px var(--gold)
 }
 .hashtag-joke:hover { color: var(--gold) !important; opacity: 1 !important; }
 
-.grid-episodes { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+.grid-episodes { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+    gap: 10px; 
+    padding: 10px;
+}
 .card { 
     background: var(--bg-card); border: 1px solid rgba(188, 19, 254, 0.2); 
     padding: 30px 15px; text-align: center; border-radius: 12px; 
@@ -81,7 +86,24 @@ nav a.active, nav a:hover { color: var(--gold); text-shadow: 0 0 5px var(--gold)
 
 .profile-container { max-width: 900px !important; }
 .profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: start; }
-@media (max-width: 700px) { .profile-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+    header {
+        padding: 10px 2%;
+    }
+    .logo { font-size: 1.2rem; }
+    nav a { margin-left: 10px; font-size: 0.7rem; }
+
+    .profile-grid { 
+        grid-template-columns: 1fr;
+    }
+    .profile-card {
+        position: static;
+        margin-bottom: 20px;
+    }
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+}
 
 .profile-card { 
     background: var(--bg-card); padding: 30px; border-radius: 20px; 
@@ -133,3 +155,8 @@ nav a.active, nav a:hover { color: var(--gold); text-shadow: 0 0 5px var(--gold)
 .section-header { border-left: 4px solid var(--gold); padding-left: 15px; margin: 40px 0 20px; display: flex; justify-content: space-between; align-items: center; }
 
 footer { text-align: center; padding: 40px; background: #080210; color: #444; margin-top: auto; border-top: 1px solid #222; }
+
+img, video {
+    max-width: 100%;
+    height: auto;
+}
