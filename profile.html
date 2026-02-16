@@ -46,10 +46,10 @@
                     </div>
 
                     <div id="owner-controls">
-                        <button onclick="logout()" style="background:#ff4444; width:100%; margin-top:20px; border-radius:8px; padding:10px;">Выйти</button>
+                        <button onclick="logout()" style="background:#ff4444; width:100%; margin-top:20px; border-radius:8px; padding:10px; color:white; border:none; font-weight:bold;">Выйти</button>
                     </div>
                     <div id="guest-controls" style="display:none;">
-                        <button onclick="resetProfileView()" style="background:var(--accent); width:100%; margin-top:20px; border-radius:8px; padding:10px;">В свой профиль</button>
+                        <button onclick="resetProfileView()" style="background:var(--accent); width:100%; margin-top:20px; border-radius:8px; padding:10px; color:white; border:none; font-weight:bold;">В свой профиль</button>
                     </div>
                 </aside>
 
@@ -72,7 +72,7 @@
 
     <script src="auth-logic.js"></script>
     <script>
-        let targetUser = null;
+        let profileOwnerLogin = null;
 
         function updateUI() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -91,28 +91,37 @@
             }
 
             if (displayUser) {
-                targetUser = displayUser.login;
+                profileOwnerLogin = displayUser.login;
+                
                 document.getElementById('auth-forms').style.display = "none";
                 document.getElementById('user-profile').style.display = "block";
+                
                 document.getElementById('user-name-display').innerText = displayUser.login;
                 document.getElementById('profile-avatar-preview').src = displayUser.avatar || 'https://via.placeholder.com/150';
 
-                // Ачивки
                 const foundEggs = JSON.parse(localStorage.getItem('found_eggs_' + displayUser.login)) || [];
                 document.getElementById('ach-detective').className = foundEggs.length >= 5 ? 'achievement unlocked' : 'achievement locked';
 
-                // Кнопки
-                document.getElementById('owner-controls').style.display = isOwner ? 'block' : 'none';
-                document.getElementById('guest-controls').style.display = isOwner ? 'none' : 'block';
-                document.getElementById('avatar-label').style.display = isOwner ? 'block' : 'none';
+                if (isOwner) {
+                    document.getElementById('owner-controls').style.display = 'block';
+                    document.getElementById('guest-controls').style.display = 'none';
+                    document.getElementById('avatar-label').style.display = 'block';
+                } else {
+                    document.getElementById('owner-controls').style.display = 'none';
+                    document.getElementById('guest-controls').style.display = 'block';
+                    document.getElementById('avatar-label').style.display = 'none';
+                }
 
-                // Форма стены
                 if(!currentUser) {
                     document.getElementById('wall-form').style.display = 'none';
                     document.getElementById('wall-auth-msg').style.display = 'block';
+                } else {
+                    document.getElementById('wall-form').style.display = 'flex';
+                    document.getElementById('wall-auth-msg').style.display = 'none';
                 }
 
                 loadWallComments(displayUser.login);
+
             } else {
                 document.getElementById('auth-forms').style.display = "block";
                 document.getElementById('user-profile').style.display = "none";
@@ -120,12 +129,12 @@
         }
 
         function loadWallComments(login) {
-            const allWallComments = JSON.parse(localStorage.getItem('banma_wall')) || {};
-            const comments = allWallComments[login] || [];
+            const allWalls = JSON.parse(localStorage.getItem('banma_wall_data')) || {};
+            const comments = allWalls[login] || [];
             const list = document.getElementById('wall-comments-list');
             
             list.innerHTML = comments.length ? comments.map(c => `
-                <div class="comment-item">
+                <div class="wall-msg">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <strong style="color:var(--gold); cursor:pointer;" onclick="viewUser('${c.from}')">${c.from}</strong>
                         <small style="opacity:0.4; font-size:0.7rem;">${c.date}</small>
@@ -140,18 +149,19 @@
             const text = document.getElementById('wall-text').value.trim();
             if (!text || !currentUser) return;
 
-            const allWallComments = JSON.parse(localStorage.getItem('banma_wall')) || {};
-            if (!allWallComments[targetUser]) allWallComments[targetUser] = [];
+            const allWalls = JSON.parse(localStorage.getItem('banma_wall_data')) || {};
+            
+            if (!allWalls[profileOwnerLogin]) allWalls[profileOwnerLogin] = [];
 
-            allWallComments[targetUser].unshift({
+            allWalls[profileOwnerLogin].unshift({
                 from: currentUser.login,
                 text: text,
-                date: new Date().toLocaleDateString()
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString().slice(0,5)
             });
 
-            localStorage.setItem('banma_wall', JSON.stringify(allWallComments));
+            localStorage.setItem('banma_wall_data', JSON.stringify(allWalls));
             document.getElementById('wall-text').value = '';
-            loadWallComments(targetUser);
+            loadWallComments(profileOwnerLogin);
         }
 
         function resetProfileView() {
