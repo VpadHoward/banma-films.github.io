@@ -1,0 +1,95 @@
+:root {
+    --bg-deep: #0f041a;
+    --bg-card: #1b0a2e;
+    --accent: #bc13fe;
+    --gold: #ffd700;
+    --white: #ffffff;
+    --text-gray: #b0a2c7;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+    font-family: 'Roboto', sans-serif; 
+    background-color: var(--bg-deep); 
+    color: var(--white); 
+    overflow-x: hidden;
+    /* FIX FOOTER: Делаем тело flex-контейнером на всю высоту */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* FIX FOOTER: Main занимает все свободное место, толкая футер вниз */
+main { flex: 1; }
+
+header { position: fixed; top: 0; width: 100%; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(15, 4, 26, 0.95); border-bottom: 2px solid var(--accent); }
+.logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 2px; color: var(--gold); }
+nav a { color: var(--text-gray); text-decoration: none; margin-left: 20px; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+nav a.active, nav a:hover { color: var(--gold); }
+#nav-auth { cursor: pointer; }
+
+.hero { padding: 120px 5% 40px; text-align: center; background: linear-gradient(to bottom, #2a0b4d 0%, var(--bg-deep) 100%); position: relative; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 4vw, 3rem); margin-bottom: 15px; }
+
+.genres { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+.genre-tag { border: 1px solid var(--accent); padding: 4px 12px; font-size: 0.7rem; color: var(--gold); }
+
+.container { padding: 20px 5% 60px; max-width: 1200px; margin: 0 auto; width: 100%; }
+.section-header { border-left: 4px solid var(--gold); padding-left: 15px; margin: 40px 0 20px; display: flex; justify-content: space-between; align-items: center; }
+
+.grid-episodes { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 25px 10px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.card:hover { background: var(--accent); transform: scale(1.05); }
+.card .num { display: block; font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+
+/* МОДАЛКА */
+.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+.modal-content { background: var(--bg-card); padding: 30px; border: 1px solid var(--accent); width: 90%; max-width: 600px; border-radius: 15px; max-height: 90vh; overflow-y: auto; position: relative; }
+.close-modal { position: absolute; right: 20px; top: 10px; font-size: 30px; cursor: pointer; }
+
+/* КОММЕНТЫ */
+.comment-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.comment-form input, .comment-form textarea { background: #000; border: 1px solid var(--accent); padding: 10px; color: #fff; border-radius: 5px; outline: none; }
+.comment-form button { background: var(--accent); color: white; border: none; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 5px; }
+.comment-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 5px; margin-bottom: 10px; border-left: 3px solid var(--accent); }
+.comment-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); }
+/* Стили для кликабельного юзера в комментах */
+.user-link { cursor: pointer; transition: 0.2s; }
+.user-link:hover { opacity: 0.7; }
+
+/* АЧИВКИ */
+.achievements-section { margin-top: 30px; text-align: left; }
+.achievements-grid { display: grid; gap: 10px; margin-top: 10px; }
+.achievement { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
+.achievement.locked { opacity: 0.2; filter: grayscale(1); }
+.achievement.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); }
+.ach-icon { font-size: 2rem; }
+.ach-info strong { display: block; color: var(--gold); }
+.ach-info span { font-size: 0.7rem; color: var(--text-gray); }
+
+/* ТОСТЫ */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--accent); padding: 15px; border-radius: 8px; z-index: 3000; box-shadow: 0 0 20px rgba(188,19,254,0.5); transform: translateY(100px); transition: 0.5s; }
+.toast.show { transform: translateY(0); }
+
+/* ПАСХАЛКИ (Спрятаны лучше) */
+.easter-egg { cursor: pointer; transition: 0.3s; user-select: none; }
+.easter-egg:hover { opacity: 0.3 !important; } 
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: rgba(15, 4, 26, 0.95);
+    border-top: 1px solid #333;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Профиль */
+.profile-card { background: var(--bg-card); padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--accent); }
+.avatar-upload { position: relative; display: inline-block; }
+.avatar-upload img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+.avatar-upload input { display: none; }
+.avatar-upload label { display: block; margin-top: 10px; color: var(--gold); cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
+.empty-block { text-align: center; padding: 50px; border: 1px dashed var(--text-gray); border-radius: 10px; }

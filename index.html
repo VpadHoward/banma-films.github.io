@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>BANMA FILMS | Серии</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">BANMA FILMS</div>
+        <nav>
+            <a href="index.html" class="active">Серии</a>
+            <a href="wiki.html">Wiki</a>
+            <a href="news.html">Новости</a>
+            <a href="profile.html" id="nav-auth">Вход</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <span class="easter-egg" onclick="findEgg('baba')" style="position: absolute; top: 20px; left: 20px; opacity: 0.01; font-size: 0.8rem;">БАБА БАБА КРУТОЙ</span>
+        <h1>Был богом, но стал рабом принцессы</h1>
+        <div class="genres">
+            <span class="genre-tag">Фентези</span>
+            <span class="genre-tag">Приключения</span>
+            <span class="genre-tag">Романтика</span>
+            <span class="genre-tag">Экшен</span>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="section-header">
+            <h2>ПРОСМОТР СЕРИЙ</h2>
+            <span style="color: var(--gold); font-size: 0.7rem;">STATUS: IN PROGRESS</span>
+        </div>
+        <div class="grid-episodes" id="episodes-grid"></div>
+    </main>
+
+    <div id="episode-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title" style="color: var(--gold); margin-bottom: 20px;"></h2>
+            
+            <div class="dev-notice" style="text-align:center; padding:20px; border:1px dashed var(--accent); margin-bottom:20px;">
+                <p style="color:var(--gold);">ВИДЕОПЛЕЕР СЕЙЧАС НЕДОСТУПЕН</p>
+                <span style="font-size:0.8rem;">Серия находится в стадии отрисовки ключевых кадров студией BANMA FILMS.</span>
+            </div>
+
+            <div class="comments-section">
+                <h3>Обсуждение серии</h3>
+                <div id="auth-check-msg" style="display:none; color:var(--accent); margin-bottom:10px;">
+                    Чтобы оставить комментарий, <a href="profile.html" style="color:var(--gold);">войдите в аккаунт</a>.
+                </div>
+                <div class="comment-form" id="comment-form-box">
+                    <p style="font-size:0.8rem; color:var(--gold);">Вы пишете как: <span id="current-user-display"></span></p>
+                    <textarea id="comment-text" rows="2" placeholder="Ваше мнение о серии..."></textarea>
+                    <button onclick="saveComment()">Опубликовать</button>
+                </div>
+                <div id="comments-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© BANMA FILMS STUDIO 2026</p>
+        <span class="easter-egg" onclick="findEgg('a4')" style="display:block; margin-top:20px; font-size: 0.5rem; letter-spacing: 5px; opacity: 0.05; color: #333;">Серёга А4 настоящий</span>
+    </footer>
+
+    <script src="auth-logic.js"></script>
+    <script>
+        let currentEpisode = null;
+
+        function initPage() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const navAuth = document.getElementById('nav-auth');
+            const formBox = document.getElementById('comment-form-box');
+            const authMsg = document.getElementById('auth-check-msg');
+
+            // Очищаем цель просмотра профиля при возврате на главную
+            localStorage.removeItem('view_target_user');
+
+            if (user) {
+                navAuth.innerText = user.login;
+                navAuth.onclick = () => { localStorage.removeItem('view_target_user'); };
+                formBox.style.display = "flex";
+                authMsg.style.display = "none";
+                document.getElementById('current-user-display').innerText = user.login;
+            } else {
+                navAuth.innerText = "Вход";
+                formBox.style.display = "none";
+                authMsg.style.display = "block";
+            }
+
+            const grid = document.getElementById('episodes-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 18; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<span class="num">${i}</span><span style="font-size: 0.6rem; opacity: 0.5;">ОБСУДИТЬ</span>`;
+                card.onclick = () => openEpisode(i);
+                grid.appendChild(card);
+            }
+        }
+
+        function openEpisode(num) {
+            currentEpisode = num;
+            document.getElementById('modal-title').innerText = `СЕРИЯ №${num}`;
+            document.getElementById('episode-modal').style.display = 'flex';
+            loadComments(num);
+        }
+
+        function closeModal() { document.getElementById('episode-modal').style.display = 'none'; }
+
+        function loadComments(episodeNum) {
+            const allComments = JSON.parse(localStorage.getItem('banma_comments')) || {};
+            const episodeComments = allComments[episodeNum] || [];
+            const users = JSON.parse(localStorage.getItem('banma_users')) || [];
+            const list = document.getElementById('comments-list');
+            
+            list.innerHTML = episodeComments.length ? episodeComments.map(c => {
+                const userData = users.find(u => u.login === c.name);
+                const avatar = (userData && userData.avatar) ? userData.avatar : 'https://via.placeholder.com/40';
+                
+                // Добавляем onclick для перехода в профиль
+                return `
+                    <div class="comment-item">
+                        <div class="user-link" onclick="viewUser('${c.name}')" style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                            <img src="${avatar}" class="comment-avatar">
+                            <strong style="color:var(--gold);">${c.name}</strong>
+                        </div>
+                        <p>${c.text}</p>
+                        <small style="opacity:0.5; font-size:0.7rem;">${c.date}</small>
+                    </div>`;
+            }).join('') : '<p style="opacity:0.5; text-align:center;">Тут пока пусто.</p>';
+        }
+
+        function saveComment() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const text = document.getElementById('comment-text').value;
+            if (!text || !user) return;
+
+            const allComments = JSON.parse(localStorage.getItem('banma_comments')) || {};
+            if (!allComments[currentEpisode]) allComments[currentEpisode] = [];
+
+            allComments[currentEpisode].unshift({
+                name: user.login,
+                text: text,
+                date: new Date().toLocaleString()
+            });
+
+            localStorage.setItem('banma_comments', JSON.stringify(allComments));
+            document.getElementById('comment-text').value = '';
+            loadComments(currentEpisode);
+        }
+
+        window.onload = initPage;
+    </script>
+</body>
+</html>

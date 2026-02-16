@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Новости | BANMA FILMS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">BANMA FILMS</div>
+        <nav>
+            <a href="index.html">Серии</a>
+            <a href="wiki.html">Wiki</a>
+            <a href="news.html" class="active">Новости</a>
+            <a href="profile.html" id="nav-auth">Вход</a>
+        </nav>
+    </header>
+
+    <main class="container" style="margin-top: 120px;">
+        <div class="section-header"><h2>НОВОСТИ ПРОЕКТА</h2></div>
+        <div class="empty-block" style="position: relative;">
+            <p>Раздел новостей пока пуст.</p>
+            <span class="easter-egg" onclick="findEgg('legends')" style="position: absolute; bottom: 5px; right: 5px; color: var(--accent); opacity: 0.02; font-size: 0.6rem;">4 легенды</span>
+        </div>
+    </main>
+    
+    <footer>
+        <p>© BANMA FILMS STUDIO 2026</p>
+    </footer>
+
+    <script src="auth-logic.js"></script>
+    <script>
+        window.onload = () => {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const navAuth = document.getElementById('nav-auth');
+            navAuth.onclick = () => { localStorage.removeItem('view_target_user'); };
+            if(user) navAuth.innerText = user.login;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль | BANMA FILMS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">BANMA FILMS</div>
+        <nav><a href="index.html">Серии</a><a href="profile.html" class="active" onclick="resetProfileView()">Профиль</a></nav>
+    </header>
+
+    <main class="container" style="margin-top: 120px; max-width: 500px;">
+        <div id="auth-forms">
+            <div class="section-header"><h2>ВХОД / РЕГИСТРАЦИЯ</h2></div>
+            <div class="comment-form">
+                <input type="text" id="auth-login" placeholder="Логин">
+                <input type="password" id="auth-pass" placeholder="Пароль">
+                <div style="display:flex; gap:10px;">
+                    <button onclick="handleAuth('login')" style="flex:1;">Войти</button>
+                    <button onclick="handleAuth('reg')" style="flex:1; background:var(--bg-card); border:1px solid var(--accent);">Регистрация</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-profile" style="display:none;">
+            <div class="section-header"><h2 id="profile-header-title">ВАШ ПРОФИЛЬ</h2></div>
+            <div class="profile-card">
+                <div class="avatar-upload">
+                    <img id="profile-avatar-preview" src="https://via.placeholder.com/150">
+                    <input type="file" id="avatar-input" accept="image/*" onchange="uploadAvatar()">
+                    <label for="avatar-input" id="avatar-label">Сменить фото</label>
+                </div>
+                <h2 id="user-name-display" style="color: var(--gold); margin: 15px 0;"></h2>
+                
+                <div class="achievements-section">
+                    <h3>ДОСТИЖЕНИЯ</h3>
+                    <div class="achievements-grid">
+                        <div id="ach-detective" class="achievement locked">
+                            <div class="ach-icon">🕵️‍♂️</div>
+                            <div class="ach-info">
+                                <strong>Детектив</strong>
+                                <span>Найдите все 5 скрытых пасхалок на сайте.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="owner-controls">
+                    <button onclick="logout()" style="background:#ff4444; width:100%; margin-top:20px;">Выйти</button>
+                </div>
+                <div id="guest-controls" style="display:none;">
+                    <button onclick="resetProfileView()" style="background:var(--accent); width:100%; margin-top:20px;">Вернуться в свой профиль</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth-logic.js"></script>
+    <script>
+        function resetProfileView() {
+            localStorage.removeItem('view_target_user');
+            location.reload();
+        }
+
+        function updateUI() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const targetUserName = localStorage.getItem('view_target_user');
+            
+            // Если мы смотрим чужой профиль, ищем его в базе
+            let displayUser = currentUser;
+            let isOwner = true;
+
+            if (targetUserName && (!currentUser || targetUserName !== currentUser.login)) {
+                const allUsers = JSON.parse(localStorage.getItem('banma_users')) || [];
+                const foundUser = allUsers.find(u => u.login === targetUserName);
+                if (foundUser) {
+                    displayUser = foundUser;
+                    isOwner = false;
+                }
+            }
+
+            if (displayUser || (targetUserName && !currentUser)) { 
+                // Показываем профиль (свой или чужой)
+                document.getElementById('auth-forms').style.display = "none";
+                document.getElementById('user-profile').style.display = "block";
+                
+                // Заполняем данные
+                document.getElementById('user-name-display').innerText = displayUser.login;
+                document.getElementById('profile-avatar-preview').src = displayUser.avatar ? displayUser.avatar : 'https://via.placeholder.com/150';
+
+                // Ачивки того, кого смотрим
+                const found = JSON.parse(localStorage.getItem('found_eggs_' + displayUser.login)) || [];
+                if (found.length >= 5) {
+                    document.getElementById('ach-detective').classList.replace('locked', 'unlocked');
+                } else {
+                     document.getElementById('ach-detective').classList.replace('unlocked', 'locked');
+                }
+
+                // Настройка интерфейса (свой/чужой)
+                if (isOwner) {
+                    document.getElementById('profile-header-title').innerText = "ВАШ ПРОФИЛЬ";
+                    document.getElementById('avatar-label').style.display = 'block';
+                    document.getElementById('owner-controls').style.display = 'block';
+                    document.getElementById('guest-controls').style.display = 'none';
+                } else {
+                    document.getElementById('profile-header-title').innerText = "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ";
+                    document.getElementById('avatar-label').style.display = 'none'; // Скрыть кнопку смены фото
+                    document.getElementById('owner-controls').style.display = 'none'; // Скрыть кнопку выхода
+                    document.getElementById('guest-controls').style.display = 'block';
+                }
+
+            } else {
+                // Если не залогинен и не смотрит никого
+                document.getElementById('auth-forms').style.display = "block";
+                document.getElementById('user-profile').style.display = "none";
+            }
+        }
+
+        function uploadAvatar() {
+            const input = document.getElementById('avatar-input');
+            const reader = new FileReader();
+            reader.onload = function() {
+                const base64 = reader.result;
+                let user = JSON.parse(localStorage.getItem('currentUser'));
+                user.avatar = base64;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                let users = JSON.parse(localStorage.getItem('banma_users'));
+                let idx = users.findIndex(u => u.login === user.login);
+                if (idx !== -1) {
+                    users[idx].avatar = base64;
+                    localStorage.setItem('banma_users', JSON.stringify(users));
+                }
+                document.getElementById('profile-avatar-preview').src = base64;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function logout() { localStorage.removeItem('currentUser'); location.reload(); }
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
