@@ -29,24 +29,35 @@ function findEgg(eggName) {
     }
 }
 
+// auth-logic.js
+
 function handleAuth(type) {
     const login = document.getElementById('auth-login').value.trim();
     const pass = document.getElementById('auth-pass').value.trim();
+    
     if (login.length < 3 || pass.length < 3) return alert("Минимум 3 символа!");
 
     let users = JSON.parse(localStorage.getItem('banma_users')) || [];
+    
     if (type === 'reg') {
         if (users.some(u => u.login === login)) return alert("Ник занят!");
+        
         users.push({ login, pass, avatar: null });
         localStorage.setItem('banma_users', JSON.stringify(users));
+        
+
+        localStorage.removeItem('found_eggs_' + login);
+        
         alert("Регистрация успешна! Теперь войдите.");
     } else {
         const user = users.find(u => u.login === login && u.pass === pass);
         if (user) {
             localStorage.setItem('currentUser', JSON.stringify(user));
-            // При входе сбрасываем просмотр чужого профиля
             localStorage.removeItem('view_target_user'); 
             location.href = "index.html";
-        } else { alert("Ошибка входа!"); }
+        } else { 
+            alert("Ошибка входа!"); 
+        }
     }
 }
+
